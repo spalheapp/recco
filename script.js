@@ -1,40 +1,40 @@
-function getTooltipGradientColor() {
-  const tooltip = document.querySelector(".tooltip");
-  const tooltipRect = tooltip.getBoundingClientRect();
-  const gradientX = tooltipRect.left + tooltipRect.width / 2;
-  const gradientY = tooltipRect.top + tooltipRect.height;
-  const gradient = window.getComputedStyle(tooltip).getPropertyValue("background-image");
-  const canvas = document.createElement("canvas");
-  canvas.width = 1;
-  canvas.height = 1;
-  const ctx = canvas.getContext("2d");
-  ctx.rect(0, 0, 1, 1);
-  const gradientObj = ctx.createLinearGradient(0, 0, 0, 1);
-  gradientObj.style = gradient;
-  ctx.fillStyle = gradientObj;
-  ctx.fill();
-  const imageData = ctx.getImageData(0, 0, 1, 1);
-  const red = imageData.data[0];
-  const green = imageData.data[1];
-  const blue = imageData.data[2];
-  return `rgb(${red}, ${green}, ${blue})`;
-}
+// js source https://codepen.io/moklick/pen/zKleC  
 
-function updateTooltipPosition(event) {
-  const tooltip = event.currentTarget;
-  const tooltipRect = tooltip.getBoundingClientRect();
-  const positionX = (event.clientX - tooltipRect.left) / tooltipRect.width * 100;
-  const positionY = (event.clientY - tooltipRect.top) / tooltipRect.height * 100;
-  tooltip.style.setProperty("--position-x", positionX);
-  tooltip.style.setProperty("--position-y", positionY);
-  
-  const gradient = window.getComputedStyle(tooltip).getPropertyValue("background-image");
-  const tooltipGradientColor = getTooltipGradientColor(gradient);
-  console.log(tooltipGradientColor);
-}
+var Application = ( function () {
+        var canvas;
+        var ctx;
+        var imgData;
+        var pix;
+        var WIDTH;
+        var HEIGHT;
+        var flickerInterval;
 
-const tooltips = document.querySelectorAll(".tooltip");
-tooltips.forEach((tooltip) => 
- //tooltip.addEventListener("mousemove", updateTooltipPosition)
-                 null
-);
+        var init = function () {
+            canvas = document.getElementById('canvas');
+            ctx = canvas.getContext('2d');
+            canvas.width = WIDTH = 700;
+            canvas.height = HEIGHT = 500;
+            ctx.fillStyle = 'white';
+            ctx.fillRect(0, 0, WIDTH, HEIGHT);
+            ctx.fill();
+            imgData = ctx.getImageData(0, 0, WIDTH, HEIGHT);
+            pix = imgData.data;
+            flickerInterval = setInterval(flickering, 30);
+        };
+
+        var flickering = function () {
+            for (var i = 0; i < pix.length; i += 4) {
+                var color = (Math.random() * 255) + 50;
+                pix[i] = color;
+                pix[i + 1] = color;
+                pix[i + 2] = color;
+            }
+            ctx.putImageData(imgData, 0, 0);
+        };
+
+        return {
+            init: init
+        };
+    }());
+
+    Application.init();
